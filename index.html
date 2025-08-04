@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>إنشاء حساب فري فاير</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      background: linear-gradient(to right, #000000, #0f0f0f);
+      font-family: 'Cairo', sans-serif;
+      color: #ffffff;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .container {
+      background-color: #1c1c1c;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 0 15px #00ff88;
+      width: 100%;
+      max-width: 500px;
+      margin: 20px;
+    }
+    h2 {
+      text-align: center;
+      color: #00ff88;
+      margin: 10px 0 20px;
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      margin-bottom: 5px;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      margin-bottom: 5px;
+      font-size: 16px;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: #00ff88;
+      border: none;
+      border-radius: 8px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      color: #000;
+      margin-top: 15px;
+    }
+    button:disabled {
+      background-color: #444;
+      cursor: not-allowed;
+      color: #999;
+    }
+    .error {
+      color: red;
+      font-size: 14px;
+      text-align: center;
+      margin-top: 10px;
+      display: none;
+    }
+    .field-error {
+      color: red;
+      font-size: 13px;
+      margin: 4px 0 8px;
+      height: 16px;
+    }
+    @media (max-width: 600px) {
+      .container { padding: 20px; }
+      input, select, button { font-size: 14px; padding: 8px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="formContainer">
+    <h2>إنشاء حساب فري فاير</h2>
+
+    <label>اسم الحساب:</label>
+    <input type="text" id="username" placeholder="مثال: ProPlayer123">
+    <div id="usernameError" class="field-error"></div>
+
+    <label>مستوي الحساب (1 - 70):</label>
+    <input type="number" id="level" min="1" max="70">
+    <div id="levelError" class="field-error"></div>
+
+    <label>عدد الجواهر (0-100000):</label>
+    <input type="number" id="diamonds" min="0" max="100000">
+    <div id="diamondsError" class="field-error"></div>
+
+    <label>عدد الذهب (0-100000):</label>
+    <input type="number" id="coins" min="0" max="100000">
+    <div id="coinsError" class="field-error"></div>
+
+    <label>نوع الحساب:</label>
+    <select id="accountType">
+      <option value="">اختر</option>
+      <option value="gmail">جيميل</option>
+      <option value="facebook">فيس بوك</option>
+    </select>
+    <div id="accountTypeError" class="field-error"></div>
+
+    <label>الجنس:</label>
+    <select id="gender">
+      <option value="">اختر</option>
+      <option value="ذكر">ذكر</option>
+      <option value="أنثى">أنثى</option>
+    </select>
+    <div id="genderError" class="field-error"></div>
+
+    <button id="generateBtn" disabled>توليد الحساب الآن</button>
+    <p id="error" class="error"></p>
+  </div>
+
+  <script>
+    // رابطك المخصص هنا
+    const customRedirectLink = 'https://your-short-link.com';
+
+    // العناصر
+    const username      = document.getElementById('username');
+    const level         = document.getElementById('level');
+    const diamonds      = document.getElementById('diamonds');
+    const coins         = document.getElementById('coins');
+    const accountType   = document.getElementById('accountType');
+    const gender        = document.getElementById('gender');
+    const generateBtn   = document.getElementById('generateBtn');
+    const error         = document.getElementById('error');
+    const formContainer = document.getElementById('formContainer');
+
+    const usernameError = document.getElementById('usernameError');
+    const levelError    = document.getElementById('levelError');
+    const diamondsError = document.getElementById('diamondsError');
+    const coinsError    = document.getElementById('coinsError');
+    const accountTypeError = document.getElementById('accountTypeError');
+    const genderError   = document.getElementById('genderError');
+
+    const emojiRegex = /([\u2700-\u27BF]|[\uE000-\uF8FF]|[\uD83C-\uDBFF\uDC00-\uDFFF])/g;
+
+    // تتبع الحقول التي تم لمسها
+    const touched = {
+      username: false,
+      level: false,
+      diamonds: false,
+      coins: false,
+      accountType: false,
+      gender: false
+    };
+
+    // منع أكثر من حساب في اليوم
+    const lastCreated = localStorage.getItem('lastCreatedDate');
+    const today = new Date().toISOString().split('T')[0];
+    if (lastCreated === today) {
+      alert("🚫 لا يمكنك إنشاء أكثر من حساب في نفس اليوم.\nحاول غدًا.");
+      formContainer.style.display = 'none';
+    }
+
+    // تحقق شامل
+    function validateForm() {
+      let valid = true;
+      error.style.display = 'none';
+
+      // اسم الحساب: فقط حروف إنجليزية وأرقام، 6-20 خانة، ويجب أن يحتوي على كلاهما
+if (touched.username) {
+  const u = username.value.trim();
+  const validChars = /^[A-Za-z0-9]{6,20}$/;
+  const onlyLettersAndNumbers = /^[A-Za-z0-9]+$/;
+  const hasLetters = /[A-Za-z]/.test(u);
+  const hasNumbers = /[0-9]/.test(u);
+
+  if (u.length < 6 || u.length > 20) {
+    usernameError.textContent = 'يجب ان يكون الاسم مكونا من 6 خانات على الاقل ولا يزيد عن 20 خانة';
+    valid = false;
+  } else if (!onlyLettersAndNumbers.test(u)) {
+    usernameError.textContent = 'الاسم يجب ان يحتوي على حروف إنجليزية وأرقام فقط';
+    valid = false;
+  } else if (!(hasLetters && hasNumbers)) {
+    usernameError.textContent = 'يجب أن يحتوي الاسم على حروف إنجليزية وأرقام معًا';
+    valid = false;
+  } else {
+    usernameError.textContent = '';
+  }
+}
+
+
+
+      // المستوى
+      if (touched.level) {
+        if (!(level.value >= 1 && level.value <= 70)) {
+          levelError.textContent = 'يجب ان يكون مستوي الحساب من 1 إلى 70 كأقصي حد';
+          valid = false;
+        } else levelError.textContent = '';
+      }
+
+      // الجواهر
+      if (touched.diamonds) {
+        if (!(diamonds.value >= 0 && diamonds.value <= 100000)) {
+          diamondsError.textContent = 'يجب ان تكون الجواهر من 0 إلى 100 الف كأقصي حد';
+          valid = false;
+        } else diamondsError.textContent = '';
+      }
+
+      // الذهب
+      if (touched.coins) {
+        if (!(coins.value >= 0 && coins.value <= 100000)) {
+          coinsError.textContent = 'يجب ان يكون الذهب من 0 إلى 100 الف كأقصي حد';
+          valid = false;
+        } else coinsError.textContent = '';
+      }
+
+      // نوع الحساب
+      if (touched.accountType) {
+        if (!accountType.value) {
+          accountTypeError.textContent = 'اختر نوع الحساب';
+          valid = false;
+        } else accountTypeError.textContent = '';
+      }
+
+      // الجنس
+      if (touched.gender) {
+        if (!gender.value) {
+          genderError.textContent = 'اختر جنس الحساب';
+          valid = false;
+        } else genderError.textContent = '';
+      }
+
+      // رسالة عامة
+      if (!valid) {
+        error.textContent = 'صحّح البيانات أعلاه ثم حاول مرة أخرى';
+        error.style.display = 'block';
+      }
+
+      const allTouched = Object.values(touched).every(Boolean);
+generateBtn.disabled = !(valid && allTouched);
+
+    }
+
+    // توليد كلمة مرور عشوائية
+    function generatePassword(len) {
+      const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
+      let pw = '';
+      for (let i = 0; i < len; i++) {
+        pw += chars.charAt(Math.random() * chars.length | 0);
+      }
+      return pw;
+    }
+
+    // حدث الإنشاء
+    generateBtn.addEventListener('click', () => {
+      const u = username.value.trim();
+      const domain = accountType.value === 'gmail' ? '@gmail.com' : '@yahoo.com';
+      const email = u.replace(/\s+/g, '').toLowerCase() + domain;
+      const password = generatePassword(10);
+
+      localStorage.setItem('username', u);
+      localStorage.setItem('level', level.value);
+      localStorage.setItem('diamonds', diamonds.value);
+      localStorage.setItem('coins', coins.value);
+      localStorage.setItem('accountType', accountType.options[accountType.selectedIndex].text);
+      localStorage.setItem('gender', gender.options[gender.selectedIndex].text);
+      localStorage.setItem('email', email);
+      localStorage.setItem('password', password);
+      localStorage.setItem('lastCreatedDate', today);
+
+      // التحويل أولًا إلى الرابط المختار
+      window.location.href = customRedirectLink;
+    });
+
+    // تتبع التفاعلات
+    username.addEventListener('blur',  () => { touched.username = true; validateForm(); });
+    level.addEventListener('blur',     () => { touched.level    = true; validateForm(); });
+    diamonds.addEventListener('blur',  () => { touched.diamonds = true; validateForm(); });
+    coins.addEventListener('blur',     () => { touched.coins    = true; validateForm(); });
+    accountType.addEventListener('change', () => { touched.accountType = true; validateForm(); });
+    gender.addEventListener('change',      () => { touched.gender      = true; validateForm(); });
+    window.addEventListener('load', validateForm);
+  </script>
+</body>
+</html>

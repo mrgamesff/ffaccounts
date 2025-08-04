@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>تم إنشاء الحساب</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      background: linear-gradient(to right, #000, #1c1c1c);
+      font-family: 'Cairo', sans-serif;
+      color: #fff;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      direction: rtl;
+    }
+    .container {
+      background-color: #111;
+      padding: 25px;
+      border-radius: 15px;
+      box-shadow: 0 0 15px #00ff88;
+      width: 100%;
+      max-width: 500px;
+    }
+    h2 {
+      color: #00ff88;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    .notice {
+      background: #222;
+      color: #ffcc00;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 14px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #222;
+      padding: 10px;
+      border-radius: 8px;
+      margin: 8px 0;
+    }
+    .label { color: #aaa; font-weight: bold; }
+    .value { color: #fff; font-weight: bold; text-align: left; }
+    .copy-btn {
+      background: #00ff88;
+      border: none;
+      border-radius: 6px;
+      padding: 5px 10px;
+      cursor: pointer;
+      font-size: 13px;
+      margin-left: 10px;
+      color: #000;
+    }
+    .copy-btn:hover { opacity: 0.9; }
+    .back-btn {
+      width: 100%;
+      padding: 12px;
+      background: #00ff88;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 20px;
+      color: #000;
+    }
+    .back-btn:hover { opacity: 0.9; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>🎉 تم إنشاء حسابك بنجاح!</h2>
+    <div class="notice">
+      إذا لم يعمل معك الحساب، حاول إنشاء حساب جديد في بداية اليوم التالي.
+    </div>
+
+    <div class="info">
+      <span class="label">اسم الحساب:</span>
+      <span class="value" id="username"></span>
+    </div>
+    <div class="info">
+      <span class="label">المستوى:</span>
+      <span class="value" id="level"></span>
+    </div>
+    <div class="info">
+      <span class="label">الجواهر:</span>
+      <span class="value" id="diamonds"></span>
+    </div>
+    <div class="info">
+      <span class="label">الذهب:</span>
+      <span class="value" id="coins"></span>
+    </div>
+    <div class="info">
+      <span class="label">نوع الحساب:</span>
+      <span class="value" id="accountType"></span>
+    </div>
+    <div class="info">
+      <span class="label">الجنس:</span>
+      <span class="value" id="gender"></span>
+    </div>
+    <div class="info">
+      <span class="label">📧 البريد الإلكتروني:</span>
+      <span class="value" id="email"></span>
+      <button class="copy-btn" onclick="copyToClipboard('email')">نسخ</button>
+    </div>
+    <div class="info">
+      <span class="label">🔒 كلمة المرور:</span>
+      <span class="value" id="password"></span>
+      <button class="copy-btn" onclick="copyToClipboard('password')">نسخ</button>
+    </div>
+
+    <button class="back-btn" onclick="goBack()">⬅ إنشاء حساب جديد</button>
+  </div>
+
+  <script>
+    // عرض البيانات
+    document.getElementById('username').textContent  = localStorage.getItem('username');
+    document.getElementById('level').textContent     = localStorage.getItem('level');
+    document.getElementById('diamonds').textContent  = localStorage.getItem('diamonds') + ' 💎';
+    document.getElementById('coins').textContent     = localStorage.getItem('coins') + ' 🪙';
+    document.getElementById('accountType').textContent = localStorage.getItem('accountType');
+    document.getElementById('gender').textContent    = localStorage.getItem('gender');
+    document.getElementById('email').textContent     = localStorage.getItem('email');
+    document.getElementById('password').textContent  = localStorage.getItem('password');
+
+    function copyToClipboard(id) {
+      const txt = document.getElementById(id).textContent;
+      navigator.clipboard.writeText(txt).then(() => {
+        alert('تم النسخ إلى الحافظة');
+      });
+    }
+
+    function goBack() {
+      window.location.href = 'index.html';
+    }
+  </script>
+</body>
+</html>
